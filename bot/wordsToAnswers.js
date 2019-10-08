@@ -1,4 +1,4 @@
-const hello = ['hi', 'hello'];
+const hello = ['hi', 'hello', 'Hello', 'Hi'];
 const elon = ['elon']
 
 const messageType = {
@@ -18,7 +18,7 @@ const getAnswer = (message, from) => {
     }
 
     const answer = {
-        [messageType.greet]: `🖖 Hi ${from.first_name || from.username}! 👋`,
+        [messageType.greet]: `🖖 Hi ${from.first_name || from.username}!`,
         [messageType.elon]: 'Maks'
     }[type];
 

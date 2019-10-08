@@ -1,7 +1,7 @@
 const { getAnswer, hear } = require('./wordsToAnswers');
 
 const startListening = bot => {
-    bot.hears(hear, ctx => {
+    bot.on('text', ctx => {
         const answer = getAnswer(ctx.message.text, ctx.message.from);
 
         if (answer) {
