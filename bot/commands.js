@@ -1,14 +1,14 @@
 const registerCommands = bot => {
 
     bot.command('showteam', ctx => {
-        const { store, reply } = ctx;
+        const { chatStore, reply } = ctx;
 
         let message = 'Registered Members: \n';
 
-        if (!store.members) {
+        if (!chatStore.members) {
             message += 'No members, be first!';
         } else {
-            for (const member of store.members.values()) {
+            for (const member of chatStore.members.values()) {
                 message += `${member.first_name} @${member.username} \n`;
             }
         }
@@ -18,15 +18,15 @@ const registerCommands = bot => {
 
     bot.command('registerme', ctx => {
 
-        const { reply, from, store } = ctx;
+        const { reply, from, chatStore } = ctx;
 
-        if (!store.members) {
-            store.members = new Map();
-        } else if (store.members.has(from.id)) {
+        if (!chatStore.members) {
+            chatStore.members = new Map();
+        } else if (chatStore.members.has(from.id)) {
             return reply(`I see member ${from.first_name || from.username} had been registered`);
         }
 
-        store.members.set(from.id, from);
+        chatStore.members.set(from.id, from);
 
         return reply(`Member ${from.first_name || from.username} was registered`);
     });

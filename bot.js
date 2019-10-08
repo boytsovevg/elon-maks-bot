@@ -2,9 +2,8 @@ const Telegraf = require('telegraf');
 const SocksAgent = require('socks5-https-client/lib/Agent');
 
 const config = require('./config');
-const { registerHears } = require('./hears');
-const { registerCommands } = require('./commands');
-
+const { startListening } = require('./bot/listen');
+const { registerCommands } = require('./bot/commands');
 
 const socksAgent = new SocksAgent({
     socksHost: config.proxy.host,
@@ -13,14 +12,20 @@ const socksAgent = new SocksAgent({
     socksPassword: config.proxy.password,
 });
 
+
 const bot = new Telegraf(config.token, {
-    telegram: { agent: socksAgent }
+    telegram: { agent: socksAgent },
+    channelMode: true
 });
 
 const store = {};
 
 bot.use((ctx, next) => {
-    ctx.store = store;
+    const chatId = ctx.chat.id;
+
+    store[chatId] = store[chatId] || {};
+    ctx.chatStore = store[chatId];
+
     next();
 })
 bot.use((ctx, next) => {
@@ -31,7 +36,7 @@ bot.use((ctx, next) => {
     })
 })
 
-registerHears(bot);
+startListening(bot);
 registerCommands(bot);
 
 bot.launch();
