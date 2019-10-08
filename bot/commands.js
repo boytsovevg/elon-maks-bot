@@ -1,3 +1,9 @@
+const commads = {
+    showteam: 'showteam - shows registered chat members',
+    registerme: 'registerme - registers you to team members',
+    help: 'help - shows a list of available commands'
+};
+
 const registerCommands = bot => {
 
     bot.command('showteam', ctx => {
@@ -23,12 +29,24 @@ const registerCommands = bot => {
         if (!chatStore.members) {
             chatStore.members = new Map();
         } else if (chatStore.members.has(from.id)) {
-            return reply(`I see member ${from.first_name || from.username} had been registered`);
+            return reply(`I see member ${from.first_name || from.username} already registered`);
         }
 
         chatStore.members.set(from.id, from);
 
-        return reply(`Member ${from.first_name || from.username} was registered`);
+        return reply(`Member ${from.first_name || from.username} registered`);
+    });
+
+    bot.command('help', ({reply}) => {
+        let helpMessage = 'Available commands: \n';
+
+        const commandsList = Object.values(commads).map(c => `/${c}\n`);
+
+        for (const c of commandsList) {
+            helpMessage += c;
+        }
+
+        return reply(helpMessage);
     });
 };
 

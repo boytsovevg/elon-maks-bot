@@ -20,6 +20,8 @@ const bot = new Telegraf(config.token, {
 
 const store = {};
 
+bot.start(ctx => ctx.reply('Hello there, use /help command to see available commands'));
+
 bot.use((ctx, next) => {
     const chatId = ctx.chat.id;
 
