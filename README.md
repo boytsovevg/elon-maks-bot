@@ -1,6 +1,6 @@
-#Elon Maks BOT
+# Elon Maks BOT
 
-##Commands
+## Commands
 - /registerme - bot registers you to chat members
 - /showteam - bot shows you all registered members
 
