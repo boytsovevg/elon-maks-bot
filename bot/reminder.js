@@ -7,7 +7,7 @@ const remindMe = ctx => {
 
     const [, name, time] = message.text.split(' ');
     if (!name || !time) {
-        return reply(`@${from.username} 🤔 \n Hmm...I think it is better to specify message and time for your reminder /help`);
+        return reply(`@${from.username} 🤔 \n Hmm...I think it is better to specify message and time for your reminder \n Example: /${commandType.remindMe} coffee 11:00`);
     }
 
     const nowTime = new Date().toString().match(/(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]/)[0];
@@ -68,7 +68,7 @@ const remindTeam = ctx => {
         const [, name, time] = message.text.split(' ');
 
         if (!name || !time) {
-            return reply(`@${from.username} 🤔 \n Hmm...I think it is better to specify message and time for your reminder /help`);
+            return reply(`@${from.username} 🤔 \n Hmm...I think it is better to specify message and time for your reminder \n Example: /${commandType.remindTeam} breakfast 11:00`);
         }
 
         const nowTime = new Date().toString().match(/(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]/)[0];

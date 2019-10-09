@@ -36,7 +36,7 @@ const registerCommands = bot => {
 
     bot.command(commandType.remindMe, ctx => remindMe(ctx));
 
-    bot.command(commandType.myreminders, ctx => {
+    bot.command(commandType.myReminders, ctx => {
         const reminders = getReminders(ctx, 'personal');
 
         ctx.reply(reminders);
