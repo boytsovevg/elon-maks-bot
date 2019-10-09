@@ -1,4 +1,4 @@
-const hello = ['hi', 'hello', 'Hello', 'Hi'];
+const hello = ['hi', 'hello'];
 const elon = ['elon']
 
 const messageType = {
@@ -9,11 +9,11 @@ const messageType = {
 const getAnswer = (message, from) => {
     let type = null;
 
-    if (hello.includes(message.toLowerCase().replace(/\W+/g, ''))) {
+    if (hello.includes(message)) {
         type = messageType.greet;
     }
 
-    if (elon.includes(message.toLowerCase().replace(/\W+/g, ''))) {
+    if (elon.includes(message)) {
         type = messageType.elon;
     }
 
@@ -27,5 +27,5 @@ const getAnswer = (message, from) => {
 
 module.exports = {
     getAnswer,
-    hear: [...elon, ...hello]
+    listeningWords: [...elon, ...hello]
 };
