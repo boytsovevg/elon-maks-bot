@@ -1,16 +1,9 @@
-const { remindMe } = require('./reminder');
-
-const commads = {
-    showteam: 'showteam - shows registered chat members',
-    registerme: 'registerme - registers you to team members',
-    remindme: 'remindme - set a reminder. (Example: /remindme breakfast 11:00)',
-    myreminders: 'myreminders - show list of incomplited reminders',
-    help: 'help - shows a list of available commands'
-};
+const { remindMe, remindTeam, getReminders } = require('./reminder');
+const { commandType } = require('./constants/commandType');
 
 const registerCommands = bot => {
 
-    bot.command('showteam', ctx => {
+    bot.command(commandType.showTeam, ctx => {
         const { chatStore, reply } = ctx;
 
         let message = 'Registered Members: \n';
@@ -26,51 +19,54 @@ const registerCommands = bot => {
         reply(message);
     });
 
-    bot.command('registerme', ctx => {
+    bot.command(commandType.register, ctx => {
 
         const { reply, from, chatStore } = ctx;
 
         if (!chatStore.members) {
             chatStore.members = new Map();
         } else if (chatStore.members.has(from.id)) {
-            return reply(`I see member ${from.first_name || from.username} already registered`);
+            return reply(`I see member @${from.username} already registered`);
         }
 
         chatStore.members.set(from.id, from);
 
-        return reply(`Member ${from.first_name || from.username} registered`);
+        return reply(`Member @${from.username} registered`);
     });
 
-    bot.command('remindme', ctx => remindMe(ctx));
+    bot.command(commandType.remindMe, ctx => remindMe(ctx));
 
-    bot.command('myreminders', ctx => {
-        const { reply, session, from } = ctx;
+    bot.command(commandType.myreminders, ctx => {
+        const reminders = getReminders(ctx, 'personal');
 
-        let remindersMessage = `${from.first_name || from.username} reminders: \n`;
-
-        const reminders = (session.reminders || []).sort((prev, curr) => prev.time < curr.time ? -1 : 1);
-
-        if (reminders.length) {
-            for (const r of reminders) {
-                remindersMessage += `${r.name} - ${r.time}\n`;
-            }
-        } else {
-            remindersMessage += 'No reminders. Add first /remindme {message} {time}';
-        }
-
-        reply(remindersMessage);
+        ctx.reply(reminders);
     });
 
-    bot.command('remindTeam', ctx => {});
+    bot.command(commandType.remindTeam, ctx => remindTeam(ctx));
 
-    bot.command('remindAt', ctx => {});
+    bot.command(commandType.teamReminders, ctx => {
 
-    bot.command('help', ({reply}) => {
+        const reminders = getReminders(ctx, 'team');
+
+        ctx.reply(reminders);
+    });
+
+    bot.command(commandType.help, ({reply}) => {
         let helpMessage = 'Available commands: \n';
 
-        const commandsList = Object.values(commads).map(c => `/${c}\n`);
+        const commandInfo = {
+            showTeam: `/${commandType.showTeam} - shows registered chat members`,
+            register: `/${commandType.register} - registers you to team members`,
+            remindMe: `/${commandType.remindMe} - set personal reminder`,
+            myReminders: `/${commandType.myReminders} - show list of incomplited personal reminders`,
+            remindTeam: `/${commandType.remindTeam} - set registered team reminder`,
+            teamReminders: `/${commandType.teamReminders} - show list of incomplited team reminders`,
+            help: `/${commandType.help} - shows a list of available commands`
+        };
 
-        for (const c of commandsList) {
+        const commandsWithDescription = Object.values(commandInfo).map(c => `${c}\n`);
+
+        for (const c of commandsWithDescription) {
             helpMessage += c;
         }
 
