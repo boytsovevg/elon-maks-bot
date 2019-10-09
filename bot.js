@@ -1,4 +1,5 @@
 const Telegraf = require('telegraf');
+const session = require('telegraf/session');
 const SocksAgent = require('socks5-https-client/lib/Agent');
 
 const config = require('./config');
@@ -22,6 +23,7 @@ const store = {};
 
 bot.start(ctx => ctx.reply('Hello there, use /help command to see available commands'));
 
+bot.use(session());
 bot.use((ctx, next) => {
     const chatId = ctx.chat.id;
 
@@ -41,5 +43,12 @@ bot.use((ctx, next) => {
 
 startListening(bot);
 registerCommands(bot);
+
+bot.telegram.getMe().then(info => {
+    bot.options.username = info.username
+    console.log(`Bot nickname: ${info.username}`);
+});
+
+bot.catch(err => console.error(`BOT ERROR: ${err}`));
 
 bot.launch();

@@ -37,7 +37,45 @@ const registerCommands = bot => {
         return reply(`Member ${from.first_name || from.username} registered`);
     });
 
-    bot.command('remindme', ctx => {});
+    bot.command('remindme', ctx => {
+        const { session, message, from, reply } = ctx;
+
+        const reminders = session.reminders || [];
+
+        let reminder = reminders.find(r => r.name === message.text);
+
+        if (!reminder) {
+            const [ , name, time ] = message.text.split(' ');
+
+            reminder = {
+                name,
+                time
+            };
+        }
+
+        reminders.push(reminder);
+        session.reminders = reminders;
+
+        return reply(`${from.first_name || from.username} I remind you to "${reminder.name}" at ${reminder.time}`);
+    });
+
+    bot.command('myreminders', ctx => {
+        const { reply, session, from } = ctx;
+
+        let remindersMessage = `${from.first_name || from.username} reminders: \n`;
+
+        const reminders = (session.reminders || []).sort((prev, curr) => prev.time < curr.time ? -1 : 1);
+
+        if (reminders.length) {
+            for (const r of reminders) {
+                remindersMessage += `${r.name} - ${r.time}\n`;
+            }
+        } else {
+            remindersMessage += 'No reminders. Add first /remindme {message} {time}';
+        }
+
+        reply(remindersMessage);
+    });
 
     bot.command('remindTeam', ctx => {});
 
