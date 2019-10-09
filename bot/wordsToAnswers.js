@@ -1,4 +1,4 @@
-const hello = ['hi', 'hello'];
+const hello = ['hi', 'hello', 'Hello', 'Hi', 'Hello!', 'Hi!'];
 const elon = ['elon']
 
 const messageType = {

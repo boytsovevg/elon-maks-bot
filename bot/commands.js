@@ -37,6 +37,12 @@ const registerCommands = bot => {
         return reply(`Member ${from.first_name || from.username} registered`);
     });
 
+    bot.command('remindme', ctx => {});
+
+    bot.command('remindTeam', ctx => {});
+
+    bot.command('remindAt', ctx => {});
+
     bot.command('help', ({reply}) => {
         let helpMessage = 'Available commands: \n';
 

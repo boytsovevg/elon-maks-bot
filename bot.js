@@ -32,14 +32,6 @@ bot.use((ctx, next) => {
 })
 
 bot.use((ctx, next) => {
-    if (!ctx.message.text.startsWith('/')) {
-        ctx.message.text = ctx.message.text.toLowerCase().replace(/\W+/g, '');
-    }
-
-    next();
-})
-
-bot.use((ctx, next) => {
     const start = new Date();
     return next(ctx).then(() => {
         const ms = new Date() - start;
