@@ -8,6 +8,11 @@ const startListening = bot => {
             return ctx.reply(answer);
         }
     });
+
+    bot.hears(['commands', 'help', 'command', '/'], ctx => {
+
+        return ctx.reply('👉🏻 /help');
+    });
 }
 
 module.exports = {

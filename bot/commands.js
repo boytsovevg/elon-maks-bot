@@ -60,8 +60,7 @@ const registerCommands = bot => {
             remindMe: `/${commandType.remindMe} - set personal reminder`,
             myReminders: `/${commandType.myReminders} - show list of incomplited personal reminders`,
             remindTeam: `/${commandType.remindTeam} - set registered team reminder`,
-            teamReminders: `/${commandType.teamReminders} - show list of incomplited team reminders`,
-            help: `/${commandType.help} - shows a list of available commands`
+            teamReminders: `/${commandType.teamReminders} - show list of incomplited team reminders`
         };
 
         const commandsWithDescription = Object.values(commandInfo).map(c => `${c}\n`);
