@@ -1,6 +1,9 @@
+import Telegraf from 'telegraf';
+import { BotContext } from '../bot';
+
 const { getAnswer, listeningWords } = require('./wordsToAnswers');
 
-const startListening = bot => {
+const startListening = (bot: Telegraf<BotContext>) => {
     bot.hears(listeningWords, ctx => {
         const answer = getAnswer(ctx.message.text, ctx.message.from);
 

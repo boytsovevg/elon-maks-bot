@@ -2,9 +2,11 @@
   "name": "elon-maks-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/bot.js",
   "scripts": {
-    "start": "nodemon bot.js"
+    "build": "tsc --skipLibCheck",
+    "develop": "tsc -w --skipLibCheck",
+    "start": "nodemon dist/bot.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +18,8 @@
     "telegraf": "^3.32.0"
   },
   "devDependencies": {
-    "nodemon": "^1.19.3"
+    "nodemon": "^1.19.3",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
   }
 }

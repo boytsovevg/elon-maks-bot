@@ -1,3 +1,5 @@
+import { User } from 'telegraf/typings/telegram-types';
+
 const hello = ['hi', 'hello', 'Hello', 'Hi', 'Hello!', 'Hi!'];
 const elon = ['elon', 'Elon'];
 
@@ -6,14 +8,14 @@ const messageType = {
     elon: 'elon'
 };
 
-const getAnswer = (message, from) => {
+const getAnswer = (textMessage: string, from: User): string => {
     let type = null;
 
-    if (hello.includes(message)) {
+    if (hello.includes(textMessage)) {
         type = messageType.greet;
     }
 
-    if (elon.includes(message)) {
+    if (elon.includes(textMessage)) {
         type = messageType.elon;
     }
 

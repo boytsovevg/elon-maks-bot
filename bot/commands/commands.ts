@@ -1,15 +1,18 @@
+import Telegraf from 'telegraf';
+import { BotContext } from '../../bot';
+
 const { remind, getReminders } = require('../commands/remind');
 const { commandType } = require('../constants/commandType');
 
-const registerCommands = bot => {
+const registerCommands = (bot: Telegraf<BotContext>) => {
 
-    bot.command(commandType.showTeam, ctx => {
+    bot.command(commandType.team, (ctx: BotContext) => {
         const { chatStore, reply } = ctx;
 
         let message = 'Registered Members: \n';
 
         if (!chatStore.members) {
-            message += `No members, be first! /${commandType.register}`;
+            message += `No members, be first! /${ commandType.register }`;
         } else {
             for (const member of chatStore.members.values()) {
                 message += `${ member.first_name } @${ member.username } \n`;
@@ -19,7 +22,7 @@ const registerCommands = bot => {
         reply(message);
     });
 
-    bot.command(commandType.register, ctx => {
+    bot.command(commandType.register, (ctx: BotContext) => {
 
         const { reply, from, chatStore } = ctx;
 
@@ -34,20 +37,15 @@ const registerCommands = bot => {
         return reply(`Member @${ from.username } registered`);
     });
 
-    bot.command(commandType.remind, ctx => remind(ctx));
+    bot.command(commandType.remind, (ctx: BotContext) => remind(ctx));
 
-    bot.command(commandType.reminders, ctx => {
-
-        const reminders = getReminders(ctx);
-
-        ctx.reply(reminders);
-    });
+    bot.command(commandType.reminders, (ctx: BotContext) => ctx.reply(getReminders(ctx)));
 
     bot.command(commandType.help, ({ reply }) => {
         let helpMessage = 'Available commands: \n';
 
         const commandInfo = {
-            showTeam: `/${ commandType.showTeam } - shows registered chat members`,
+            team: `/${ commandType.team } - shows registered chat members`,
             register: `/${ commandType.register } - registers you to team members`,
             remindTeam: `/${ commandType.remind } - set registered team reminder`,
             teamReminders: `/${ commandType.reminders } - show list of incomplete team reminders`
