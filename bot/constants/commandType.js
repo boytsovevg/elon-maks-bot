@@ -1,10 +1,8 @@
 const commandType = {
     showTeam: 'showTeam',
     register: 'register',
-    remindMe: 'remindMe',
-    myReminders: 'myReminders',
-    remindTeam: 'remindTeam',
-    teamReminders: 'teamReminders',
+    remind: 'remind',
+    reminders: 'reminders',
     help: 'help'
 };
 

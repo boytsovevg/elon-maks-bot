@@ -4,7 +4,8 @@ const SocksAgent = require('socks5-https-client/lib/Agent');
 
 const config = require('./config');
 const { startListening } = require('./bot/listen');
-const { registerCommands } = require('./bot/commands');
+const { registerCommands } = require('./bot/commands/commands');
+const { commandType } = require('./bot/constants/commandType');
 
 const socksAgent = new SocksAgent({
     socksHost: config.proxy.host,
@@ -21,7 +22,7 @@ const bot = new Telegraf(config.token, {
 
 const store = {};
 
-bot.start(ctx => ctx.reply('Hello there, use /help command to see available commands'));
+bot.start(ctx => ctx.reply(`Hello there, use /${commandType.help} command to see available commands`));
 
 bot.use(session());
 bot.use((ctx, next) => {

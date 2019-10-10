@@ -1,10 +1,10 @@
 const hello = ['hi', 'hello', 'Hello', 'Hi', 'Hello!', 'Hi!'];
-const elon = ['elon']
+const elon = ['elon', 'Elon'];
 
 const messageType = {
     greet: 'greet',
     elon: 'elon'
-}
+};
 
 const getAnswer = (message, from) => {
     let type = null;
@@ -17,13 +17,11 @@ const getAnswer = (message, from) => {
         type = messageType.elon;
     }
 
-    const answer = {
-        [messageType.greet]: `🖖 Hi ${from.first_name || from.username}!`,
+    return {
+        [messageType.greet]: `🖖 Hi ${ from.first_name || from.username }!`,
         [messageType.elon]: 'Maks'
     }[type];
-
-    return answer;
-}
+};
 
 module.exports = {
     getAnswer,

@@ -13,7 +13,7 @@ const startListening = bot => {
 
         return ctx.reply('👉🏻 /help');
     });
-}
+};
 
 module.exports = {
     startListening
