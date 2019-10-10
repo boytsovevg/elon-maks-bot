@@ -31,13 +31,15 @@ const createReminder = (message: Message): Reminder => {
         throw Error(`Hmm...I think it is better to specify message and time for your reminder \n Example: /${ commandType.remind } breakfast 11:00`)
     }
 
+    const botTime = time.replace(/(:|\.)/, ':');
+
     const [nowTime] = new Date().toString().match(/(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]/);
 
-    if (nowTime > time) {
+    if (nowTime > botTime) {
         throw Error(`Hmm...To be honest I can't remind you in the past /${ commandType.help }`);
     }
 
-    return { id: createId(), name, time };
+    return { id: createId(), name, time: botTime };
 };
 
 const setReminder = (reminder: Reminder, chatStore: ChatStore, reply: any) => {

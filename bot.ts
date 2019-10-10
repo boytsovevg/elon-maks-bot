@@ -1,19 +1,17 @@
 import Telegraf, { ContextMessageUpdate } from 'telegraf';
 import { User } from 'telegram-typings';
+import { config } from './config';
 
 const session = require('telegraf/session');
 const SocksAgent = require('socks5-https-client/lib/Agent');
 
-const config = require('./config');
 const { startListening } = require('./bot/listen');
 const { registerCommands } = require('./bot/commands/commands');
 const { commandType } = require('./bot/constants/commandType');
 
 const socksAgent = new SocksAgent({
     socksHost: config.proxy.host,
-    socksPort: config.proxy.port,
-    socksUsername: config.proxy.login,
-    socksPassword: config.proxy.password,
+    socksPort: config.proxy.port
 });
 
 
