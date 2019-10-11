@@ -51,12 +51,15 @@ const setReminder = (reminder: Reminder, chatStore: ChatStore, reply: any) => {
         .replace(/(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]/, reminder.time);
 
     const intervalId = setInterval(() => {
+        reminder.intervalId = intervalId;
+
         const timeNow = new Date();
         const reminderTime = new Date(dateTimeString);
 
         try {
             if (timeNow.getTime() >= reminderTime.getTime()) {
-                clearInterval(intervalId);
+                clearInterval(reminder.intervalId);
+
                 const members = getMembers(chatStore);
                 chatStore.reminders = chatStore.reminders.filter(r => r.id !== reminder.id);
 
@@ -79,12 +82,10 @@ const getMembers = (chatStore: ChatStore): string[] => {
     throw Error(`No members in team. Everyone should /${ commandType.register }`)
 };
 
-const getReminders = (ctx: BotContext) => {
-    const { chatStore } = ctx;
-
+const getRemindersMessage = (store: ChatStore): string => {
     let remindersMessage = 'Team reminders: \n';
 
-    const reminders = (chatStore.reminders || [])
+    const reminders = (store.reminders || [])
         .sort((prev, curr) => prev.time < curr.time ? -1 : 1);
 
     if (reminders.length) {
@@ -98,7 +99,35 @@ const getReminders = (ctx: BotContext) => {
     return remindersMessage;
 };
 
+const getReminders = (store: ChatStore): Reminder[] => {
+    return store.reminders || [];
+};
+
+const updateReminder = async (reminderName: string, ctx: BotContext): Promise<Message> => {
+
+    try {
+        deleteReminder(reminderName, ctx.chatStore);
+    } catch (error) {
+        return ctx.telegram.sendMessage(ctx.chat.id, error.message);
+    }
+
+    return await remind(ctx);
+};
+
+const deleteReminder = (reminderName: string, store: ChatStore): void => {
+    const reminders = getReminders(store);
+
+    const reminderToUpdate = reminders.find(r => r.name === reminderName);
+
+    if (reminderToUpdate) {
+        clearInterval(reminderToUpdate.intervalId);
+    } else {
+        throw Error(`Reminder with name ${reminderName} doesnt exist`);
+    }
+};
+
 module.exports = {
     remind,
-    getReminders
+    getRemindersMessage,
+    deleteReminder
 };

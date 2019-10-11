@@ -1,6 +1,7 @@
 import Telegraf, { ContextMessageUpdate } from 'telegraf';
 import { User } from 'telegram-typings';
 import { config } from './config';
+import Timeout = NodeJS.Timeout;
 
 const session = require('telegraf/session');
 const SocksAgent = require('socks5-https-client/lib/Agent');
@@ -27,6 +28,7 @@ export interface Reminder {
     id: string;
     name: string;
     time: string;
+    intervalId?: Timeout;
 }
 
 export interface ChatStore {
@@ -35,7 +37,8 @@ export interface ChatStore {
 }
 
 export interface BotContext extends ContextMessageUpdate {
-    chatStore: ChatStore
+    chatStore: ChatStore;
+    session: any;
 }
 
 const store: Store = {};

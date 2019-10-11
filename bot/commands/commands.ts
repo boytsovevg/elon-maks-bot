@@ -1,10 +1,29 @@
-import Telegraf from 'telegraf';
+import Telegraf, { Extra, Markup } from 'telegraf';
 import { BotContext } from '../../bot';
 
-const { remind, getReminders } = require('../commands/remind');
+const { remind, getRemindersMessage, deleteReminder } = require('../commands/remind');
 const { commandType } = require('../constants/commandType');
 
 const registerCommands = (bot: Telegraf<BotContext>) => {
+
+    bot.command(commandType.help, ({ reply }) => {
+        let helpMessage = 'Available commands: \n';
+
+        const commandInfo = {
+            team: `/${ commandType.team } - shows registered chat members`,
+            register: `/${ commandType.register } - registers you to team members`,
+            remindTeam: `/${ commandType.remind } - set registered team reminder`,
+            teamReminders: `/${ commandType.reminders } - show list of incomplete team reminders`
+        };
+
+        const commandsWithDescription = Object.values(commandInfo).map(c => `${ c }\n`);
+
+        for (const c of commandsWithDescription) {
+            helpMessage += c;
+        }
+
+        return reply(helpMessage);
+    });
 
     bot.command(commandType.team, (ctx: BotContext) => {
         const { chatStore, reply } = ctx;
@@ -39,25 +58,35 @@ const registerCommands = (bot: Telegraf<BotContext>) => {
 
     bot.command(commandType.remind, (ctx: BotContext) => remind(ctx));
 
-    bot.command(commandType.reminders, (ctx: BotContext) => ctx.reply(getReminders(ctx)));
+    bot.command(commandType.reminders, (ctx: BotContext) => ctx.reply(getRemindersMessage(ctx)));
 
-    bot.command(commandType.help, ({ reply }) => {
-        let helpMessage = 'Available commands: \n';
+    bot.command(commandType.update, (ctx: BotContext) => {
 
-        const commandInfo = {
-            team: `/${ commandType.team } - shows registered chat members`,
-            register: `/${ commandType.register } - registers you to team members`,
-            remindTeam: `/${ commandType.remind } - set registered team reminder`,
-            teamReminders: `/${ commandType.reminders } - show list of incomplete team reminders`
-        };
+        const keyboard = Markup.inlineKeyboard([
+            Markup.callbackButton('Delete', 'delete')
+        ]);
 
-        const commandsWithDescription = Object.values(commandInfo).map(c => `${ c }\n`);
+        const { session, message } = ctx;
+        const [, name] = message.text.split(' ');
 
-        for (const c of commandsWithDescription) {
-            helpMessage += c;
+        session.lastEditedName = name;
+
+        return ctx.telegram.sendCopy(ctx.chat.id, ctx.message, Extra.markup(keyboard));
+    });
+
+    bot.action('delete', async (ctx: BotContext) => {
+
+        const { from, session, chatStore, deleteMessage } = ctx;
+
+        try {
+            deleteReminder(session.lastEditedName, chatStore);
+            await deleteMessage();
+
+        } catch (error) {
+            ctx.reply(`@${from.username} \n ${error.message}`)
         }
 
-        return reply(helpMessage);
+        ctx.reply(`${ctx.session.lastEditedName} deleted`);
     });
 };
 
