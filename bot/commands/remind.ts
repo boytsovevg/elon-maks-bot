@@ -9,12 +9,16 @@ const remind = (ctx: BotContext) => {
     const { chatStore, message, from, reply } = ctx;
 
     try {
+        const members = getMembers(chatStore);
+
+        if (!members.some(username => username === `@${from.username}`)) {
+            throw Error(`Can not find you in team members - /${commandType.register}`);
+        }
+
         const reminder = createReminder(message);
         setReminder(reminder, chatStore, reply);
         chatStore.reminders = chatStore.reminders || [];
         chatStore.reminders.push(reminder);
-
-        const members = getMembers(chatStore);
 
         return reply(`I will remind ${ members } to ${ reminder.name } at ${ reminder.time }`);
 
@@ -65,7 +69,7 @@ const setReminder = (reminder: Reminder, chatStore: ChatStore, reply: any) => {
     }, 3000);
 };
 
-const getMembers = (chatStore: ChatStore) => {
+const getMembers = (chatStore: ChatStore): string[] => {
 
     if (chatStore.members) {
 
