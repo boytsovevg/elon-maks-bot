@@ -4,30 +4,64 @@ import { Message } from 'telegram-typings';
 
 const createId = require('nanoid');
 
-const remind = (ctx: BotContext) => {
+export const remind = async (ctx: BotContext): Promise<Message> => {
 
     const { chatStore, message, from, reply } = ctx;
 
     try {
-        const members = getMembers(chatStore);
+        const members = _getMembers(chatStore);
 
-        if (!members.some(username => username === `@${from.username}`)) {
-            throw Error(`Can not find you in team members - /${commandType.register}`);
+        if (!members.some(username => username === `@${ from.username }`)) {
+            throw Error(`Can not find you in team members - /${ commandType.register }`);
         }
 
-        const reminder = createReminder(message);
-        setReminder(reminder, chatStore, reply);
+        const reminder = _createReminder(message);
+        _setReminder(reminder, chatStore, reply);
         chatStore.reminders = chatStore.reminders || [];
         chatStore.reminders.push(reminder);
 
-        return reply(`I will remind ${ members } to ${ reminder.name } at ${ reminder.time }`);
+        return await reply(`I will remind ${ members } to ${ reminder.name } at ${ reminder.time }`);
 
     } catch (error) {
-        return reply(`@${ from.username } 🤔 \n ${ error.message }`);
+        return await reply(`@${ from.username } 🤔 \n ${ error.message }`);
     }
 };
 
-const createReminder = (message: Message): Reminder => {
+export const getRemindersMessage = (store: ChatStore): string => {
+    let remindersMessage = 'Team reminders: \n';
+
+    const reminders = (store.reminders || [])
+        .sort((prev, curr) => prev.time < curr.time ? -1 : 1);
+
+    if (reminders.length) {
+        for (const r of reminders) {
+            remindersMessage += `${ r.name } - ${ r.time }\n`;
+        }
+    } else {
+        remindersMessage += `No reminders. Add first /${ commandType.remind } {message} {time}`;
+    }
+
+    return remindersMessage;
+};
+
+export const deleteReminder = (reminderName: string, store: ChatStore): void => {
+    const reminders = getReminders(store);
+
+    const reminder = reminders.find(r => r.name === reminderName);
+
+    if (reminder) {
+        clearInterval(reminder.intervalId);
+        store.reminders = store.reminders.filter(r => r.id !== reminder.id);
+    } else {
+        throw Error(`Reminder with name ${ reminderName } does not exist`);
+    }
+};
+
+export const getReminders = (store: ChatStore): Reminder[] => {
+    return store.reminders || [];
+};
+
+const _createReminder = (message: Message): Reminder => {
 
     const [, name, time] = message.text.split(' ');
 
@@ -46,7 +80,7 @@ const createReminder = (message: Message): Reminder => {
     return { id: createId(), name, time: botTime };
 };
 
-const setReminder = (reminder: Reminder, chatStore: ChatStore, reply: any) => {
+const _setReminder = (reminder: Reminder, chatStore: ChatStore, reply: any) => {
     const dateTimeString = new Date().toString()
         .replace(/(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]/, reminder.time);
 
@@ -60,7 +94,7 @@ const setReminder = (reminder: Reminder, chatStore: ChatStore, reply: any) => {
             if (timeNow.getTime() >= reminderTime.getTime()) {
                 clearInterval(reminder.intervalId);
 
-                const members = getMembers(chatStore);
+                const members = _getMembers(chatStore);
                 chatStore.reminders = chatStore.reminders.filter(r => r.id !== reminder.id);
 
                 return reply(`${ members } It is time to ${ reminder.name }`);
@@ -72,7 +106,7 @@ const setReminder = (reminder: Reminder, chatStore: ChatStore, reply: any) => {
     }, 3000);
 };
 
-const getMembers = (chatStore: ChatStore): string[] => {
+const _getMembers = (chatStore: ChatStore): string[] => {
 
     if (chatStore.members) {
 
@@ -80,54 +114,4 @@ const getMembers = (chatStore: ChatStore): string[] => {
     }
 
     throw Error(`No members in team. Everyone should /${ commandType.register }`)
-};
-
-const getRemindersMessage = (store: ChatStore): string => {
-    let remindersMessage = 'Team reminders: \n';
-
-    const reminders = (store.reminders || [])
-        .sort((prev, curr) => prev.time < curr.time ? -1 : 1);
-
-    if (reminders.length) {
-        for (const r of reminders) {
-            remindersMessage += `${ r.name } - ${ r.time }\n`;
-        }
-    } else {
-        remindersMessage += `No reminders. Add first /${ commandType.remind } {message} {time}`;
-    }
-
-    return remindersMessage;
-};
-
-const getReminders = (store: ChatStore): Reminder[] => {
-    return store.reminders || [];
-};
-
-const updateReminder = async (reminderName: string, ctx: BotContext): Promise<Message> => {
-
-    try {
-        deleteReminder(reminderName, ctx.chatStore);
-    } catch (error) {
-        return ctx.telegram.sendMessage(ctx.chat.id, error.message);
-    }
-
-    return await remind(ctx);
-};
-
-const deleteReminder = (reminderName: string, store: ChatStore): void => {
-    const reminders = getReminders(store);
-
-    const reminderToUpdate = reminders.find(r => r.name === reminderName);
-
-    if (reminderToUpdate) {
-        clearInterval(reminderToUpdate.intervalId);
-    } else {
-        throw Error(`Reminder with name ${reminderName} doesnt exist`);
-    }
-};
-
-module.exports = {
-    remind,
-    getRemindersMessage,
-    deleteReminder
 };

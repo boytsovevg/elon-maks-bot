@@ -1,7 +1,8 @@
 import Telegraf, { Extra, Markup } from 'telegraf';
 import { BotContext } from '../../bot';
 
-const { remind, getRemindersMessage, deleteReminder } = require('../commands/remind');
+import { remind, getRemindersMessage, deleteReminder, getReminders } from './remind';
+
 const { commandType } = require('../constants/commandType');
 
 const registerCommands = (bot: Telegraf<BotContext>) => {
@@ -58,7 +59,7 @@ const registerCommands = (bot: Telegraf<BotContext>) => {
 
     bot.command(commandType.remind, (ctx: BotContext) => remind(ctx));
 
-    bot.command(commandType.reminders, (ctx: BotContext) => ctx.reply(getRemindersMessage(ctx)));
+    bot.command(commandType.reminders, (ctx: BotContext) => ctx.reply(getRemindersMessage(ctx.chatStore)));
 
     bot.command(commandType.update, (ctx: BotContext) => {
 
@@ -66,8 +67,18 @@ const registerCommands = (bot: Telegraf<BotContext>) => {
             Markup.callbackButton('Delete', 'delete')
         ]);
 
-        const { session, message } = ctx;
+        const { from, session, message, reply, chatStore } = ctx;
         const [, name] = message.text.split(' ');
+
+        if (!name) {
+            return reply(`@${ from.username } specify reminder name \n (Example: /update coffee)`);
+        }
+
+        const reminders = getReminders(chatStore);
+
+        if (!reminders.find(r => r.name === name)) {
+            return reply(`@${ from.username } \n Reminder "${ name }" doesn't exist \n Create new? /${ commandType.remind }`);
+        }
 
         session.lastEditedName = name;
 
@@ -79,14 +90,13 @@ const registerCommands = (bot: Telegraf<BotContext>) => {
         const { from, session, chatStore, deleteMessage } = ctx;
 
         try {
-            deleteReminder(session.lastEditedName, chatStore);
             await deleteMessage();
-
+            deleteReminder(session.lastEditedName, chatStore);
         } catch (error) {
-            ctx.reply(`@${from.username} \n ${error.message}`)
+            return ctx.reply(`@${ from.username } \n ${ error.message }`)
         }
 
-        ctx.reply(`${ctx.session.lastEditedName} deleted`);
+        return ctx.reply(`Reminder "${ ctx.session.lastEditedName }" deleted`);
     });
 };
 
