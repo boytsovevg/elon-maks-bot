@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "date-fns": "^2.4.1",
-    "nanoid": "^2.1.2",
+    "nanoid": "^3.1.31",
     "socks5-https-client": "^1.2.1",
     "telegraf": "^3.32.0"
   },
